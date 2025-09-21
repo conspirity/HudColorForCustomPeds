@@ -51,9 +51,9 @@ namespace HudColorForCustomPeds
 
         private void RestoreHudColor()
         {
-            Function.Call(Hash.REPLACE_HUD_COLOUR, 143, 143);
-            Function.Call(Hash.REPLACE_HUD_COLOUR, 144, 144);
-            Function.Call(Hash.REPLACE_HUD_COLOUR, 145, 145);
+            Function.Call(Hash.REPLACE_HUD_COLOUR_WITH_RGBA, 143, 101, 180, 212, 255);
+            Function.Call(Hash.REPLACE_HUD_COLOUR_WITH_RGBA, 144, 171, 237, 171, 255);
+            Function.Call(Hash.REPLACE_HUD_COLOUR_WITH_RGBA, 145, 255, 163, 87, 255);
         }
 
         private void OnTick(object sender, EventArgs e)
