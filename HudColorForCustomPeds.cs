@@ -41,15 +41,15 @@ namespace HudColorForCustomPeds
             }
             catch
             {
-                Notification.Show($"[{ModName} {ModVersion}] ~r~Error: ~w~Failed to load {iniFile}. Using default values instead.");
+                Notification.PostTicker($"[{ModName} {ModVersion}] ~r~Error: ~w~Failed to load {iniFile}. Using default values instead.", false, false);
             }
         }
 
         private void UseCustomHudColor()
         {
-            Function.Call(Hash.REPLACE_HUD_COLOUR, 116, 143);
-            Function.Call(Hash.REPLACE_HUD_COLOUR, 116, 144);
-            Function.Call(Hash.REPLACE_HUD_COLOUR, 116, 145);
+            Function.Call(Hash.REPLACE_HUD_COLOUR, 143, _customColorId);
+            Function.Call(Hash.REPLACE_HUD_COLOUR, 144, _customColorId);
+            Function.Call(Hash.REPLACE_HUD_COLOUR, 145, _customColorId);
 
             _isCustomHudColorSet = true;
         }
@@ -65,15 +65,13 @@ namespace HudColorForCustomPeds
 
         private void OnTick(object sender, EventArgs e)
         {
-            var playerPed = Function.Call<Ped>(Hash.PLAYER_PED_ID);
+            Player player = Game.Player;
+            Ped playerPed = player.Character;
+            string playerPedHash = playerPed.Model.Hash.ToString();
 
-            var michaelHash = Function.Call<Hash>(Hash.GET_HASH_KEY, "player_zero");
-            var franklinHash = Function.Call<Hash>(Hash.GET_HASH_KEY, "player_one");
-            var trevorHash = Function.Call<Hash>(Hash.GET_HASH_KEY, "player_two");
-
-            bool isMichael = Function.Call<bool>(Hash.IS_PED_MODEL, playerPed, michaelHash);
-            bool isFranklin = Function.Call<bool>(Hash.IS_PED_MODEL, playerPed,franklinHash);
-            bool isTrevor = Function.Call<bool>(Hash.IS_PED_MODEL, playerPed, trevorHash);
+            bool isMichael = playerPedHash == "225514697" || playerPedHash == "player_zero" || playerPedHash == "Michael";
+            bool isFranklin = playerPedHash == "-1692214353" || playerPedHash == "player_one" || playerPedHash == "Franklin";
+            bool isTrevor = playerPedHash == "-1686040670" || playerPedHash == "player_two" || playerPedHash == "Trevor";
 
             if (!isMichael && !isFranklin && !isTrevor) _isUsingCustomPed = true;
             else _isUsingCustomPed = false;
