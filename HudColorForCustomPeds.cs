@@ -16,10 +16,13 @@ namespace HudColorForCustomPeds
 {
     public class HudColorForCustomPeds : Script
     {
+        public string ModName = "Hud Color Override For Custom Peds";
+        public string ModVersion = "v1.0";
+
         private ScriptSettings _config;
         private bool _isUsingCustomPed;
         private bool _isCustomHudColorSet;
-        private int _customColorId;
+        private readonly int _customColorId;
 
         public HudColorForCustomPeds()
         {
@@ -38,15 +41,17 @@ namespace HudColorForCustomPeds
             }
             catch
             {
-                Notification.Show($"~r~Error~w~: Failed to {iniFile}");
+                Notification.Show($"[{ModName} {ModVersion}] ~r~Error: ~w~Failed to load {iniFile}. Using default values instead.");
             }
         }
 
-        private void SetCustomHudColor()
+        private void UseCustomHudColor()
         {
-            Function.Call(Hash.REPLACE_HUD_COLOUR, _customColorId, 143);
-            Function.Call(Hash.REPLACE_HUD_COLOUR, _customColorId, 144);
-            Function.Call(Hash.REPLACE_HUD_COLOUR, _customColorId, 145);
+            Function.Call(Hash.REPLACE_HUD_COLOUR, 116, 143);
+            Function.Call(Hash.REPLACE_HUD_COLOUR, 116, 144);
+            Function.Call(Hash.REPLACE_HUD_COLOUR, 116, 145);
+
+            _isCustomHudColorSet = true;
         }
 
         private void RestoreHudColor()
@@ -54,11 +59,13 @@ namespace HudColorForCustomPeds
             Function.Call(Hash.REPLACE_HUD_COLOUR_WITH_RGBA, 143, 101, 180, 212, 255);
             Function.Call(Hash.REPLACE_HUD_COLOUR_WITH_RGBA, 144, 171, 237, 171, 255);
             Function.Call(Hash.REPLACE_HUD_COLOUR_WITH_RGBA, 145, 255, 163, 87, 255);
+
+            _isCustomHudColorSet = false;
         }
 
         private void OnTick(object sender, EventArgs e)
         {
-            var playerPed = Function.Call<Ped>(Hash.GET_PLAYER_PED);
+            var playerPed = Function.Call<Ped>(Hash.PLAYER_PED_ID);
 
             var michaelHash = Function.Call<Hash>(Hash.GET_HASH_KEY, "player_zero");
             var franklinHash = Function.Call<Hash>(Hash.GET_HASH_KEY, "player_one");
@@ -68,25 +75,11 @@ namespace HudColorForCustomPeds
             bool isFranklin = Function.Call<bool>(Hash.IS_PED_MODEL, playerPed,franklinHash);
             bool isTrevor = Function.Call<bool>(Hash.IS_PED_MODEL, playerPed, trevorHash);
 
-            if (!isMichael && !isFranklin && !isTrevor)
-            {
-                _isUsingCustomPed = true;
-            }
-            else
-            { 
-                _isUsingCustomPed = false;
-            }
+            if (!isMichael && !isFranklin && !isTrevor) _isUsingCustomPed = true;
+            else _isUsingCustomPed = false;
 
-            if (_isUsingCustomPed && !_isCustomHudColorSet)
-            {
-                SetCustomHudColor();
-                _isCustomHudColorSet = true;
-            }
-            else if (!_isUsingCustomPed && _isCustomHudColorSet)
-            {
-                RestoreHudColor();
-                _isCustomHudColorSet = false;
-            }
+            if (_isUsingCustomPed && !_isCustomHudColorSet) UseCustomHudColor();
+            if (!_isUsingCustomPed && _isCustomHudColorSet) RestoreHudColor();
         }
 
         private void OnAbort(object sender, EventArgs e)
